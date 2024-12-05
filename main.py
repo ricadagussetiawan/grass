@@ -30,7 +30,7 @@ async def connect_to_wss(socks5_proxy, user_id):
                     proxy = Proxy.from_url(socks5_proxy)
                     # Connecting with the proxy
                     async with proxy_connect(uri, proxy=proxy, ssl=ssl_context, extra_headers={
-                        "Origin": "chrome-extension://ilehaonighjijnmpnagapkhpcdbhclfg",
+                        "Origin": "chrome-extension://lkbnfiajjmbhnfledhphioinpickokdi",
                         "User-Agent": custom_headers["User-Agent"]
                     }) as websocket:
                         logger.info(f"Connected to {uri} via proxy {socks5_proxy}")
@@ -62,7 +62,7 @@ async def connect_to_wss(socks5_proxy, user_id):
                                             "timestamp": int(time.time()),
                                             "device_type": "extension",
                                             "version": "4.26.2",
-                                            "extension_id": "ilehaonighjijnmpnagapkhpcdbhclfg"
+                                            "extension_id": "lkbnfiajjmbhnfledhphioinpickokdi"
                                         }
                                     }
                                     logger.debug(auth_response)
