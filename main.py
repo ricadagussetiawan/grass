@@ -7,8 +7,8 @@ import uuid
 from loguru import logger
 from websockets_proxy import Proxy, proxy_connect
 
-async def connect_to_wss(socks5_proxy, user_id):
-    device_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, socks5_proxy))
+async def connect_to_wss(socks4_proxy, user_id):
+    device_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, socks4_proxy))
     logger.info(device_id)
     while True:
         try:
@@ -27,13 +27,13 @@ async def connect_to_wss(socks5_proxy, user_id):
             for port in ports:
                 uri = f"wss://{server_hostname}:{port}/"
                 try:
-                    proxy = Proxy.from_url(socks5_proxy)
+                    proxy = Proxy.from_url(socks4_proxy)
                     # Connecting with the proxy
                     async with proxy_connect(uri, proxy=proxy, ssl=ssl_context, extra_headers={
                         "Origin": "chrome-extension://lkbnfiajjmbhnfledhphioinpickokdi",
                         "User-Agent": custom_headers["User-Agent"]
                     }) as websocket:
-                        logger.info(f"Connected to {uri} via proxy {socks5_proxy}")
+                        logger.info(f"Connected to {uri} via proxy {socks4_proxy}")
 
                         # Function to send PING message periodically
                         async def send_ping():
@@ -76,20 +76,20 @@ async def connect_to_wss(socks5_proxy, user_id):
                             send_ping_task.cancel()
                         break  # Exit the loop if connected successfully
                 except Exception as e:
-                    logger.error(f"Error connecting to {uri} with proxy {socks5_proxy}: {str(e)}")
+                    logger.error(f"Error connecting to {uri} with proxy {socks4_proxy}: {str(e)}")
                     # If the first URI fails, try the next one
                     continue
 
         except Exception as e:
-            logger.error(f"Error with proxy {socks5_proxy}: {str(e)}")
+            logger.error(f"Error with proxy {socks4_proxy}: {str(e)}")
             if any(error_msg in str(e) for error_msg in [
                 "[SSL: WRONG_VERSION_NUMBER]", 
                 "invalid length of packed IP address string", 
                 "Empty connect reply", 
                 "Device creation limit exceeded", 
                 "sent 1011 (internal error) keepalive ping timeout; no close frame received"]):
-                logger.info(f"Removing error proxy from the list: {socks5_proxy}")
-                remove_proxy_from_list(socks5_proxy)
+                logger.info(f"Removing error proxy from the list: {socks4_proxy}")
+                remove_proxy_from_list(socks4_proxy)
                 return None  # Signal to the main loop to replace this proxy
             else:
                 continue  # Continue to try to reconnect or handle other errors
@@ -111,7 +111,7 @@ async def main():
         return  # Exit if an invalid number is entered
 
     proxy_file = 'proxy.txt'  # Path to your proxy.txt file
-    # format => socks5://username:pass@ip:port
+    # format => socks4://username:pass@ip:port
     try:
         with open(proxy_file, 'r') as file:
             all_proxies = file.read().splitlines()
